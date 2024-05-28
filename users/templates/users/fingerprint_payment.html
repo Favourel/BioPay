@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fingerprint Payment</title>
+</head>
+<body>
+<h1>Fingerprint Authentication for Payment</h1>
+<p>Please authenticate using your fingerprint to proceed with the payment.</p>
+<button id="fingerprintBtn">Authenticate with Fingerprint</button>
+
+<script>
+    document.getElementById('fingerprintBtn').addEventListener('click', async () => {
+        try {
+            const publicKey = {
+                challenge: new Uint8Array(32), // Generate this securely on the server
+                rp: { name: "Example Company" },
+                user: { id: new Uint8Array(16), name: "exampleUser", displayName: "Example User" },
+                pubKeyCredParams: [{ type: "public-key", alg: -7 }]
+            };
+
+            const credential = await navigator.credentials.create({ publicKey });
+
+            if (credential) {
+                const authData = credential.response.authenticatorData;
+                const clientDataJSON = credential.response.clientDataJSON;
+                const rawId = credential.rawId;
+                const signature = credential.response.signature;
+
+                // Send these to the server for verification
+                const response = await fetch('/process_payment/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        id: credential.id,
+                        rawId: Array.from(new Uint8Array(rawId)),
+                        type: credential.type,
+                        response: {
+                            authenticatorData: Array.from(new Uint8Array(authData)),
+                            clientDataJSON: Array.from(new Uint8Array(clientDataJSON)),
+                            signature: Array.from(new Uint8Array(signature))
+                        }
+                    })
+                });
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert('Payment successful!');
+                } else {
+                    alert('Payment failed: ' + result.message);
+                }
+            } else {
+                alert('Fingerprint authentication failed');
+            }
+        } catch (error) {
+            console.error('Error during fingerprint authentication', error);
+            alert('Fingerprint authentication failed');
+        }
+    });
+</script>
+</body>
+</html>

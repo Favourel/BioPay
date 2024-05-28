@@ -1,0 +1,183 @@
+{% extends 'users/base.html' %}
+{% load static %}
+{% block title %} Available Driver {% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<style>
+    #map {
+        height: 600px;
+        width: 100%;
+    }
+</style>
+<div class="container">
+    <h3 class="mt-2" style="font-family: vremenagrotesk,sans-serif;
+    font-weight: 900;line-height: 1.5;"><b>Available Drivers</b></h3>
+    <div class="row">
+        <div class="col-lg-9">
+            <div class="box-element">
+                <div id="map"></div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="box-element">
+                {% if drivers|length > 0 %}
+                <a href="#" type="button" data-target="#BookRideModal"
+                   data-toggle="modal" class="btn btn-block">Book ride</a>
+                {% else %}
+                <button disabled href="#" type="button" data-target="#BookRideModal"
+                        data-toggle="modal" class="btn btn-block">Can not book ride right now
+                </button>
+                {% endif %}
+            </div>
+            <br>
+            {% if drivers|length > 0 %}
+            <div class="box-element">
+                <table class="table table-hover">
+                    <thead style="background-color: #f8f9fa;font-size: 13px">
+                    <tr>
+                        <th>Driver</th>
+                        <th>Number</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {% for p in drivers %}
+                    <tr class="p-1">
+                        <td class="d-block">
+                            {{ p.user.username }} ({{ p.car_model }})
+                            <br>
+                        </td>
+                        <td>
+                            {{ p.phone_number }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</div>
+<div class="modal fade" id="BookRideModal" tabindex="-3" aria-labelledby="bookrideModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-scrollable modal-dialog-centered" role="document">
+        <div class="modal-content" style="background-color: #f6f9fc !important">
+            <div class="modal-header">
+                <h5 class="modal-title"><strong>Book Ride</strong></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">
+                    <span class="svg-icon svg-icon-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="#fff">
+                            <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1"
+                                  transform="rotate(-45 6 17.3137)" fill="black"></rect>
+                            <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)"
+                                  fill="black"></rect>
+                        </svg>
+                    </span>
+                    </span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'book_ride' %}" method="post" class=""
+                      data-url="">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <input type="text" name="drop_off_location" class="form-control mb-2"
+                           placeholder="Enter drop off location">
+                    <input type="hidden" id="id_latitude" name="latitude">
+                    <input type="hidden" id="id_longitude" name="longitude">
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn mb-2" onclick="getStudentLocation()">Use My Location</button>
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit"
+                                    id="book" class="btn btn-block">
+                                <div class="spinner-border text-light hide" id="spinner" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <span id="button-text">Book ride</span>
+                            </button>
+                            <style>
+                                .spinner-border {
+                                    width: 1.5rem;
+                                    height: 1.5rem;
+                                }
+                                .hide {
+                                    display: none;
+                                }
+                            </style>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getStudentLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+            alert("Done!.")
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function showPosition(position) {
+        document.getElementById("id_latitude").value = position.coords.latitude;
+        document.getElementById("id_longitude").value = position.coords.longitude;
+    }
+</script>
+<script>
+    var map;
+
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+      } else {
+        console.error("Geolocation is not supported by this browser.");
+        // Optionally set a default location here
+        map = L.map('map').setView([51.505, -0.09], 13);  // Fallback location
+      }
+    }
+
+    function showPosition(position) {
+      map = L.map('map').setView([position.coords.latitude, position.coords.longitude], 13);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+      }).addTo(map);
+
+      fetch('/available_drivers_json/')
+        .then(response => response.json())
+        .then(data => {
+          var carIcon = L.icon({
+            iconUrl: '{% static 'images/big-tour-bus-vector-illustra' %}',  // Replace with the path to your car icon
+            iconSize: [32, 37],  // Adjust the size as needed
+            iconAnchor: [16, 37],  // The point of the icon which will correspond to marker's location
+            popupAnchor: [0, -37]  // Point from which the popup should open relative to the iconAnchor
+          });
+
+          data.forEach(driver => {
+            L.marker([driver.latitude, driver.longitude]) // , { icon: carIcon }
+              .addTo(map)
+              .bindPopup(`<b>${driver.username} (${driver.car_model})</b><br>${driver.phone_number}`);
+          });
+        })
+        .catch(error => console.error('Error fetching driver data:', error));
+    }
+
+    function showError(error) {
+      console.error("Error getting user location:", error);
+      // Optionally set a default location here
+      map = L.map('map').setView([51.505, -0.09], 13);  // Fallback location
+    }
+
+    getLocation();
+</script>
+{% endblock %}

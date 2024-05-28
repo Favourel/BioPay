@@ -1,0 +1,522 @@
+{% extends 'users/base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}BioPay | Dashboard{% endblock %}
+
+{% block content %}
+<br>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<div class="container">
+    <h3 class="mb-4"
+        style="font-family: vremenagrotesk,sans-serif;font-weight: 900;line-height: 1.5;"><b>
+        {% if 0 >= now %}
+        Good morning,
+        {% elif now < 11.1 %}
+        Good morning,
+        {% elif 12 >= now %}
+        Good afternoon,
+        {% elif now < 15.1 %}
+        Good afternoon,
+        {% elif 16 >= now %}
+        Good evening,
+        {% elif now < 19.1 %}
+        Good evening,
+        {% elif 20 >= now %}
+        Good night,
+        {% elif now < 23.1 %}
+        Good night,
+        {% endif %}
+        {% if request.user.first_name %}
+        {{ request.user.first_name }} 😉!
+        {% elif request.user.username %}
+        {{ request.user.username }}😉! {% endif %}</b>
+    </h3>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="box-element p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                     fill="currentColor" class="bi bi-wallet2 mb-1"
+                     viewBox="0 0 16 16">
+                    <path d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z"/>
+                </svg>
+                <b>Account Balance</b>
+                <hr class="my-2 mb-3">
+                <div class="row">
+                    <div class="col">
+                        {% if request.user.account.amount %}
+                        <h4 id="amount-count">
+                            ₦{{request.user.account.amount|intcomma}}
+                        </h4>
+                        {% else %}
+                        <h4>₦0.00</h4>
+                        {% endif %}
+                    </div>
+                    <div class="col-auto">
+                        <a href="#" data-target="#TopUpModal"
+                           data-toggle="modal" class="btn">Top-up</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="box-element p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                     class="mb-1 bi bi-bell" viewBox="0 0 16 16">
+                    <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6"/>
+                </svg>
+                <b>Notifications</b>
+                <hr class="my-2 mb-3">
+                <div class="row">
+                    <div class="col">
+                        <h4>
+                            {% if notifications|length >= 1 %}
+                            You have {{notifications|length}} unread Notifications
+                            {% else %}
+                            Nothing to see here
+                            {% endif %}
+                        </h4>
+                    </div>
+                    <div class="col-auto">
+                        <a onclick="openNav()" href="#" class="btn">Check?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <style>
+        .image-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Adjust the max-width as needed */
+            margin: 0 auto; /* Center the container horizontally */
+        }
+
+        .background-image {
+            width: 100%;
+            height: 300px;
+            display: block;
+            background-position: 50% 50%;
+            background-repeat: no-repeat;
+        }
+
+        .overlay-card {
+            position: absolute;
+            left: 50%;
+            bottom: -16%; /* Adjust this value to control how far up the card is from the bottom */
+            transform: translateX(-50%);
+            width: 85%; /* Adjust the width as needed */
+            padding: 15px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            border-right: 5px solid #fd5631; /* Add the orange border to the right side */
+            border-radius: 10px; /* Optional: Rounded corners */
+        }
+    </style>
+
+    <div class="row">
+        <div class="col-lg-8 mt-2">
+            <div class="box-element mb-4 text-lightm mbg-gradient">
+                <style>
+                    .bg-gradient {
+                        background-color: #b03a2e;
+                        font-color: black;
+                        text-color: #fff;
+                    }
+                </style>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                     class="mb-1 bi bi-bar-chart-line" viewBox="0 0 16 16">
+                    <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1zm1 12h2V2h-2zm-3 0V7H7v7zm-5 0v-3H2v3z"/>
+                </svg>
+                <b>Travel statistics</b>
+                <hr>
+                <h4>₦{{ride_total|intcomma}}</h4>
+                <p class="badge badge-secondary p-2">Avg ₦{{month|intcomma}} per month</p>
+                <canvas class="my-2 w-100 p-2 rounded" id="pie-chart" width="900" height="250"
+                        style="font-color: white;text-color: #fff;">
+                </canvas>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mt-2">
+            <div class="box-element">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                     class="mb-1 bi bi-truck-front" viewBox="0 0 16 16">
+                    <path d="M5 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0m8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-6-1a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2zM4 2a1 1 0 0 0-1 1v3.9c0 .625.562 1.092 1.17.994C5.075 7.747 6.792 7.5 8 7.5s2.925.247 3.83.394A1.008 1.008 0 0 0 13 6.9V3a1 1 0 0 0-1-1zm0 1h8v3.9q0 .002 0 0l-.002.004-.005.002h-.004C11.088 6.761 9.299 6.5 8 6.5s-3.088.26-3.99.406h-.003l-.005-.002L4 6.9q0 .002 0 0z"/>
+                    <path d="M1 2.5A2.5 2.5 0 0 1 3.5 0h9A2.5 2.5 0 0 1 15 2.5v9c0 .818-.393 1.544-1 2v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5V14H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2a2.5 2.5 0 0 1-1-2zM3.5 1A1.5 1.5 0 0 0 2 2.5v9A1.5 1.5 0 0 0 3.5 13h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 12.5 1z"/>
+                </svg>
+                <b>Previous trips</b>
+                <hr>
+                {% if ride_history %}
+                {% for ride in ride_history %}
+                <a class="text-decoration-none text-dark" href="{{ride.get_absolute_url}}">
+                    <div class="row">
+                        <div class="col">
+                            <div class="media">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" fill="currentColor"
+                                     class="bi bi-truck-front-fill mt-2" viewBox="0 0 16 16">
+                                    <path d="M3.5 0A2.5 2.5 0 0 0 1 2.5v9c0 .818.393 1.544 1 2v2a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5V14h6v1.5a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-2c.607-.456 1-1.182 1-2v-9A2.5 2.5 0 0 0 12.5 0zM3 3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3.9c0 .625-.562 1.092-1.17.994C10.925 7.747 9.208 7.5 8 7.5s-2.925.247-3.83.394A1.008 1.008 0 0 1 3 6.9zm1 9a1 1 0 1 1 0-2 1 1 0 0 1 0 2m8 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2m-5-2h2a1 1 0 1 1 0 2H7a1 1 0 1 1 0-2"/>
+                                </svg>
+                                <div class="media-body ml-2">
+                                    <b>{{ride.end_location}}</b>
+                                    <div>
+                                        <small>{{ride.start_time}}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <b>₦{{ride.fare|intcomma}}</b>
+                        </div>
+                    </div>
+                </a>
+                <hr>
+                {% endfor %}
+                {% else %}
+                No available ride yet
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <b>Recent Drivers</b>
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="image-container">
+                <img src="{% static 'images/4-thumb.png' %}" alt="Image Description"
+                     class="background-image">
+                <div class="overlay-card">
+                    <h5>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.1em" height="1.1em" fill="currentColor"
+                             class="bi bi-person-fill mr-0 mb-1" viewBox="0 0 16 16">
+                            <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                        </svg>
+                        <b>Fred</b>
+                    </h5>
+                    <b>
+                        <svg width=".8em" height=".8em" viewBox="0 0 16 16"
+                             class="bi mr-1 bi-telephone-outbound-fill"
+                             fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                  d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511zM11 .5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V1.707l-4.146 4.147a.5.5 0 0 1-.708-.708L14.293 1H11.5a.5.5 0 0 1-.5-.5z"/>
+                        </svg>
+                        08065658734</b>
+                    <br>
+                    <b>
+                        <svg xmlns="http://www.w3.org/2000/svg" width=".8em" height=".8em" fill="currentColor"
+                             class="bi bi-calendar3 mr-1" viewBox="0 0 16 16">
+                            <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
+                            <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                        </svg>
+                        May 22 &bull;
+                        <svg xmlns="http://www.w3.org/2000/svg" width=".8em" height=".8em" fill="currentColor"
+                             class="mr-1 bi bi-star-fill mb-1" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        4/5 </b>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-3">
+            <div class="image-container">
+                <img src="{% static 'images/2-thumb1_lhTbW1r_qa39aUd.png' %}" alt="Image Description"
+                     class="background-image">
+                <div class="overlay-card">
+                    <h4>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.1em" height="1.1em" fill="currentColor"
+                             class="bi bi-person-fill mr-1 mb-1" viewBox="0 0 16 16">
+                            <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                        </svg>
+                        Isaac
+                    </h4>
+                    <b>
+                        <svg width=".8em" height=".8em" viewBox="0 0 16 16"
+                             class="bi mr-1 bi-telephone-outbound-fill"
+                             fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                  d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511zM11 .5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V1.707l-4.146 4.147a.5.5 0 0 1-.708-.708L14.293 1H11.5a.5.5 0 0 1-.5-.5z"/>
+                        </svg>
+                        08065658734</b>
+                    <br>
+                    <b>
+                        <svg xmlns="http://www.w3.org/2000/svg" width=".8em" height=".8em" fill="currentColor"
+                             class="bi bi-calendar3 mr-1" viewBox="0 0 16 16">
+                            <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
+                            <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                        </svg>
+                        May 22 &bull;
+                        <svg xmlns="http://www.w3.org/2000/svg" width=".8em" height=".8em" fill="currentColor"
+                             class="mr-1 bi bi-star-fill mb-1" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        4/5 </b>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-3">
+            <div class="image-container">
+                <img src="{% static 'images/3.jpg' %}" alt="Image Description"
+                     class="background-image">
+                <div class="overlay-card">
+                    <h4>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.1em" height="1.1em" fill="currentColor"
+                             class="bi bi-person-fill mr-1 mb-1" viewBox="0 0 16 16">
+                            <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                        </svg>
+                        Jane
+                    </h4>
+                    <b>
+                        <svg width=".8em" height=".8em" viewBox="0 0 16 16"
+                             class="bi mr-1 bi-telephone-outbound-fill"
+                             fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                  d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511zM11 .5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V1.707l-4.146 4.147a.5.5 0 0 1-.708-.708L14.293 1H11.5a.5.5 0 0 1-.5-.5z"/>
+                        </svg>
+                        08065658734</b>
+                    <br>
+                    <b>
+                        <svg xmlns="http://www.w3.org/2000/svg" width=".8em" height=".8em" fill="currentColor"
+                             class="bi bi-calendar3 mr-1" viewBox="0 0 16 16">
+                            <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
+                            <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                        </svg>
+                        May 22 &bull;
+                        <svg xmlns="http://www.w3.org/2000/svg" width=".8em" height=".8em" fill="currentColor"
+                             class="mr-1 bi bi-star-fill mb-1" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        4/5 </b>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <div align="center">
+        <a class="btn" href="">View All</a>
+    </div>
+    <br>
+</div>
+<script>
+    var config = {
+      type: 'bar',
+      data: {
+        datasets: [{
+          data:
+          [
+          350, 700, 300, 450, 550, 600, 700
+          //{% for product in chart_products %}
+          //{{product}},
+          //{% endfor %}
+
+        ],
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(255, 206, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(153, 102, 255, 0.2)',
+            'rgba(255, 159, 64, 0.2)',
+            'rgba(58, 224, 25, 0.5)',
+        ],
+        borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)',
+            'rgba(58, 224, 25, 1)',
+        ],
+        borderWidth: 4,
+        color: ['#000'],
+        pointBackgroundColor: '#00FFFF',
+        label: 'Prices',
+        }],
+        labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Wednesday', 'Friday'],
+        //labels: {{ DOW_CHOICES|safe }},
+      },
+      options: {
+        responsive: true
+      }
+    };
+
+    window.onload = function() {
+      var ctx = document.getElementById('pie-chart').getContext('2d');
+      window.myPie = new Chart(ctx, config);
+    };
+
+</script>
+<div class="modal fade" id="TopUpModal" tabindex="-3" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-scrollable modal-dialog-centered" role="document">
+        <div class="modal-content" style="background-color: #f6f9fc !important">
+            <div class="modal-header">
+                <h5 class="modal-title"><strong>Request Top-up</strong></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">
+                    <span class="svg-icon svg-icon-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="#fff">
+                            <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1"
+                                  transform="rotate(-45 6 17.3137)" fill="black"></rect>
+                            <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)"
+                                  fill="black"></rect>
+                        </svg>
+                    </span>
+                    </span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="." method="post" class="my-withdrawal-form"
+                      data-url="">
+                    {% csrf_token %}
+                    <b>Available balance: <span class="current_balance">
+                        {% if request.user.account.amount %}
+                        ₦{{request.user.account.amount|intcomma}}
+                        {% else %}
+                        ₦0.00
+                        {% endif %}
+                    </span></b>
+                    <input type="number" required name="amount" id="topupamount"
+                           placeholder="Enter your Top-up amount" class="form-control mt-2 mb-2">
+                    <p><b id="password_result" class="mb-2 mt-1"
+                          style="float: center;margin-top: 0.25rem;font-size: 80%;"></b></p>
+                    <div class="row">
+                        <div class="col"></div>
+                        <div class="col-auto">
+                            <button type="button" onclick="payWithPaystack()"
+                                    id="make-payment" class="btn btn-block">
+                                <div class="spinner-border text-light hide" id="spinner" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <span id="button-text">Top-up</span>
+                            </button>
+                            <style>
+                                .spinner-border {
+                                    width: 1.5rem;
+                                    height: 1.5rem;
+                                }
+                                .hide {
+                                    display: none;
+                                }
+                            </style>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var user = '{{ request.user }}'
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+</script>
+<script>
+    const paymentForm = document.getElementById('make-payment');
+    paymentForm.addEventListener("click", payWithPaystack, false);
+    function payWithPaystack(e) {
+     e.preventDefault();
+     let inputElement = document.getElementById("topupamount");
+     let numberValue = parseFloat(inputElement.value);
+     let handler = PaystackPop.setup({
+       key: '{{paystack_public_key}}', // Replace with your public key
+       email: '{{ request.user.email }}',
+       currency: 'NGN',
+       amount:  numberValue * 100,
+       ref: '{{ payment.ref }}', // generates a pseudo-unique reference. Please replace with a reference you generated. Or remove the line entirely so our API will generate one for you
+       //ref: ''+Math.floor((Math.random() * 1000000000) + 1), // generates a pseudo-unique reference. Please replace with a reference you generated. Or remove the line entirely so our API will generate one for you
+       // label: "Optional string that replaces customer email"
+       onClose: function(){
+         alert('There was an error with processing payment. Kindly refresh page and run again');
+       },
+       callback: function(response){
+         let message = 'Payment complete! Reference: ' + response.reference;
+
+         var userData = {
+                   'reference':response.reference,
+                   'amount': numberValue
+               }
+               console.log(userData);
+           var url = '{% url 'process_topUp' %}'
+           console.log(userData);
+
+           fetch(url,
+               {
+                   method: 'POST',
+                   headers: {'Content-Type': '/application/json', 'X-CSRFToken':csrftoken,},
+                   body:JSON.stringify({'ref': userData})
+
+               }
+           )
+
+           .then((response) =>{
+                   return response.json()
+               })
+
+           .then((data) =>{
+                   console.log('Success:', data);
+                   window.location.href = '/'
+               })
+
+         //console.log(message);
+       }
+     });
+
+     handler.openIframe();
+    }
+</script>
+<script>
+    function animateValue(obj, start, end, duration) {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const animatedValue = Math.floor(progress * (end - start) + start);
+
+        // Format the animated value as intcomma with Naira sign
+        const formattedValue = formatNumberWithNairaSign(animatedValue);
+        obj.textContent = formattedValue;
+
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
+
+    function formatNumberWithNairaSign(number) {
+      const formattedNumber = number.toFixed(2); // Adjust decimals here (e.g., .toFixed(1) for one decimal)
+      return "₦" + formattedNumber.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    const obj = document.getElementById("amount-count");
+    const actualAmount = parseFloat({{ request.user.account.amount }}); // Assuming request.user.account.amount is a float
+    animateValue(obj, 0, actualAmount, 4000);
+
+</script>
+
+{% endblock%}

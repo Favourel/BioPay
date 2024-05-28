@@ -1,0 +1,380 @@
+{% extends 'users/base.html' %}
+{% load static %}
+{% block title %} Available Driver {% endblock %}
+
+{% block content %}
+<br>
+<div class="container">
+    <div class="row gx-3">
+        <div class="col-lg-3 phone_size">
+            <div class="sticky-top" style="top: 80px">
+                <div class="card border-0 p-2">
+                    <div align="center" class="customer-profile">
+                        <br>
+                        <img width="120" height="120" background="#fff" color="#fff"
+                             class="rounded-circle customer-image " src="{{ request.user.driver.driver_picture.url }}">
+
+                        <h5>
+                            {{ request.user.username }}
+                            {% if request.user.driver.is_verified %}
+                            <img width="20px" height="20px" class="mb-1"
+                                 src="{% static 'images/verify.png' %}" alt="">
+                            {% endif %}
+                        </h5>
+                        <p>{{ request.user.driver.about }}</p>
+                    </div>
+                    <hr>
+                    <div class="d-block">
+                        <b>13 </b> Following |
+                        <b class="_result_following"> 90 </b> Followers
+                    </div>
+                    <hr class="my-2">
+                    <div class="row gx-3">
+                        <div class="col-auto">
+                            <a class="btn-lg-block btn text-light"
+                               data-target="#updateUserModal" data-toggle="modal">Edit
+                                profile
+                            </a>
+                        </div>
+                    </div>
+
+                    <hr class="my-2">
+                    <p>
+                        <img class="mr-2" src="https://img.icons8.com/ios-filled/20/000000/location-update--v2.png"/>
+                        {{ request.user.driver.license_number }}
+                    </p>
+                    <hr class="my-1">
+                    <div class="d-md-block">
+                        <a href="tel:{{ request.user.driver.phone_number }}"
+                           class="text-decoration-none category-link">
+                            <p class="btn-call" onclick="off()">
+                                <svg width="1em" height="1em" viewBox="0 0 16 16"
+                                     class="bi mr-2 bi-telephone-outbound-fill"
+                                     fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                          d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511zM11 .5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V1.707l-4.146 4.147a.5.5 0 0 1-.708-.708L14.293 1H11.5a.5.5 0 0 1-.5-.5z"/>
+                                </svg>
+                                {{request.user.driver.phone_number }}
+                            </p>
+                        </a>
+                        <style>
+                            .category-link {color: #000;}
+                            .category-link:hover{
+                                color: #db3717;
+                                }
+                        </style>
+                    </div>
+                    <hr class="my-1">
+                    <p>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
+                             class="bi bi-calendar3 mr-2" viewBox="0 0 16 16">
+                            <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
+                            <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                        </svg>
+                        Joined {{ request.user.driver.date_joined|time }} &bull;
+                        {{ request.user.driver.date_joined|date }}
+                    </p>
+                </div>
+                <br>
+            </div>
+        </div>
+        <br>
+        <div class="col-lg-9 col-md-9 ">
+            <div class="row">
+                <div class="col">
+                    <h3 style="font-family: vremenagrotesk,sans-serif;font-weight: 900;line-height: 1.5;"
+                        class="mb-4">
+                        {% if 0 >= now %}
+                        Good morning,
+                        {% elif now < 11.1 %}
+                        Good morning,
+                        {% elif 12 >= now %}
+                        Good afternoon,
+                        {% elif now < 15.1 %}
+                        Good afternoon,
+                        {% elif 16 >= now %}
+                        Good evening,
+                        {% elif now < 19.1 %}
+                        Good evening,
+                        {% elif 20 >= now %}
+                        Good night,
+                        {% elif now < 23.1 %}
+                        Good night,
+                        {% endif %}
+                        {{ request.user }}😉!
+                    </h3>
+                </div>
+                <div class="col-auto mt-2">
+                    <b class="text-muted float-left">
+                        Turn on availability
+                    </b>
+
+                    <label class="switch ml-1 mt-2">
+                        <input type="checkbox" id="togglePassword">
+                        <span class="slider round"></span>
+                    </label>
+                    <style>
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 14px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 13px;
+      width: 13px;
+      left: 2px;
+      right: 14px;
+      align-items: center;
+
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+    .slider:after {
+        right: 4px;
+    }
+    input:checked + .slider {
+      background-color: #fd5631;
+
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 1px #2196F3;
+
+    }
+
+    input:checked + .slider:before {
+      -webkit-transform: translateX(24px);
+      -ms-transform: translateX(24px);
+      transform: translateX(24px);
+
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 14px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
+
+
+</style>
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="col-lg-6">
+                    <div class="box-element">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                             class="mb-1 bi bi-truck-front" viewBox="0 0 16 16">
+                            <path d="M5 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0m8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-6-1a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2zM4 2a1 1 0 0 0-1 1v3.9c0 .625.562 1.092 1.17.994C5.075 7.747 6.792 7.5 8 7.5s2.925.247 3.83.394A1.008 1.008 0 0 0 13 6.9V3a1 1 0 0 0-1-1zm0 1h8v3.9q0 .002 0 0l-.002.004-.005.002h-.004C11.088 6.761 9.299 6.5 8 6.5s-3.088.26-3.99.406h-.003l-.005-.002L4 6.9q0 .002 0 0z"/>
+                            <path d="M1 2.5A2.5 2.5 0 0 1 3.5 0h9A2.5 2.5 0 0 1 15 2.5v9c0 .818-.393 1.544-1 2v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5V14H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2a2.5 2.5 0 0 1-1-2zM3.5 1A1.5 1.5 0 0 0 2 2.5v9A1.5 1.5 0 0 0 3.5 13h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 12.5 1z"/>
+                        </svg>
+                        <b>Current Ride</b>
+                        <hr>
+                        {% if current_rides %}
+                        {% for ride in current_rides %}
+                        <p>Pickup Location: {{ ride.start_location }}</p>
+                        <p>Dropoff Location: {{ ride.end_location }}</p>
+                        <p>Customer: {{ ride.user.username }}</p>
+                        <p>Status: {{ ride.status }}</p>
+                        {% endfor %}
+                        {% else %}
+                        <p>No current rides.</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="box-element">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                             class="mb-1 bi bi-truck-front" viewBox="0 0 16 16">
+                            <path d="M5 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0m8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-6-1a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2zM4 2a1 1 0 0 0-1 1v3.9c0 .625.562 1.092 1.17.994C5.075 7.747 6.792 7.5 8 7.5s2.925.247 3.83.394A1.008 1.008 0 0 0 13 6.9V3a1 1 0 0 0-1-1zm0 1h8v3.9q0 .002 0 0l-.002.004-.005.002h-.004C11.088 6.761 9.299 6.5 8 6.5s-3.088.26-3.99.406h-.003l-.005-.002L4 6.9q0 .002 0 0z"/>
+                            <path d="M1 2.5A2.5 2.5 0 0 1 3.5 0h9A2.5 2.5 0 0 1 15 2.5v9c0 .818-.393 1.544-1 2v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5V14H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2a2.5 2.5 0 0 1-1-2zM3.5 1A1.5 1.5 0 0 0 2 2.5v9A1.5 1.5 0 0 0 3.5 13h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 12.5 1z"/>
+                        </svg>
+                        <b>Available Rides</b>
+                        <hr>
+                        {% if available_rides %}
+
+                        {% for ride in available_rides %}
+                        <div class="row">
+                            <div class="col">
+                                <div class="media">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em"
+                                         fill="currentColor"
+                                         class="mb-1 bi bi-truck-front mt-2 mr-1" viewBox="0 0 16 16">
+                                        <path d="M5 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0m8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-6-1a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2zM4 2a1 1 0 0 0-1 1v3.9c0 .625.562 1.092 1.17.994C5.075 7.747 6.792 7.5 8 7.5s2.925.247 3.83.394A1.008 1.008 0 0 0 13 6.9V3a1 1 0 0 0-1-1zm0 1h8v3.9q0 .002 0 0l-.002.004-.005.002h-.004C11.088 6.761 9.299 6.5 8 6.5s-3.088.26-3.99.406h-.003l-.005-.002L4 6.9q0 .002 0 0z"/>
+                                        <path d="M1 2.5A2.5 2.5 0 0 1 3.5 0h9A2.5 2.5 0 0 1 15 2.5v9c0 .818-.393 1.544-1 2v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5V14H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2a2.5 2.5 0 0 1-1-2zM3.5 1A1.5 1.5 0 0 0 2 2.5v9A1.5 1.5 0 0 0 3.5 13h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 12.5 1z"/>
+                                    </svg>
+                                    <div class="media-body">
+                                        <b>Dropoff: {{ ride.end_location }}</b>
+                                        <div>
+                                            <small>Pickup: {{ ride.start_location }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <p><a href="">Accept Ride</a></p>
+                            </div>
+                        </div>
+                        <hr>
+                        {% endfor %}
+
+                        {% else %}
+                        <p>No available rides.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row mt-1">
+                <div class="col-lg-8">
+                    <div class="box-element">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                             class="mb-1 bi bi-truck-front" viewBox="0 0 16 16">
+                            <path d="M5 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0m8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-6-1a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2zM4 2a1 1 0 0 0-1 1v3.9c0 .625.562 1.092 1.17.994C5.075 7.747 6.792 7.5 8 7.5s2.925.247 3.83.394A1.008 1.008 0 0 0 13 6.9V3a1 1 0 0 0-1-1zm0 1h8v3.9q0 .002 0 0l-.002.004-.005.002h-.004C11.088 6.761 9.299 6.5 8 6.5s-3.088.26-3.99.406h-.003l-.005-.002L4 6.9q0 .002 0 0z"/>
+                            <path d="M1 2.5A2.5 2.5 0 0 1 3.5 0h9A2.5 2.5 0 0 1 15 2.5v9c0 .818-.393 1.544-1 2v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5V14H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2a2.5 2.5 0 0 1-1-2zM3.5 1A1.5 1.5 0 0 0 2 2.5v9A1.5 1.5 0 0 0 3.5 13h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 12.5 1z"/>
+                        </svg>
+                        <b>Ride History</b>
+                        <hr>
+                        {% if ride_history %}
+
+                        <table class="table table-hover">
+                            <thead style="background-color: #f8f9fa;font-size: 13px">
+                            <tr>
+                                <th>Ride ID</th>
+                                <th>Pickup Location</th>
+                                <th>Dropoff Location</th>
+                                <th>Fare</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for ride in ride_history %}
+                            <tr class="p-1">
+                                <td class="d-block">
+                                    {{ ride.id }}
+                                    <br>
+                                </td>
+                                <td>
+                                    {{ ride.start_location }}
+                                </td>
+                                <td>
+                                    {{ ride.end_location }}
+                                </td>
+                                <td>
+                                    {{ ride.status }}
+                                </td>
+                                <td>
+                                    {{ ride.fare }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                        {% else %}
+                        No available ride history
+                        {% endif %}
+
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="box-element">
+                        <b>Passengers Overview</b>
+                        <hr>
+                        <p>Daily Passengers: {{ daily_passengers }}</p>
+                        <p>Weekly Passengers: {{ weekly_passengers }}</p>
+                        <p>Monthly Passengers: {{ monthly_passengers }}</p>
+                        <p>Total Passengers: {{ total_passengers }}</p>
+
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-lg-12 mt-1">
+                    <div class="box-element">
+                        <b>Notifications</b>
+                        <hr>
+                        {% if notifications|length >= 1 %}
+                        You have {{notifications|length}} unread Notifications
+                        {% else %}
+                        Nothing to see here
+                        {% endif %}
+                        <br>
+                        <br>
+                        <b>Support</b>
+                        <a href="">Contact Support</a>
+                        <a href="">FAQ</a>
+                    </div>
+                </div>
+            </div>
+            <br><br>
+        </div>
+    </div>
+</div>
+<style>
+    .border-0 {
+    border: 0!important;
+}
+.card {
+    box-shadow: 0 2px 1rem rgba(0,0,0,.15);
+    background-color: white;
+    position: relative;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0 solid transparent;
+    border-radius: 5px;
+}
+.customer-profile {
+    padding: 1rem;
+    text-align: center;
+    background: #f8f9fa;
+}
+
+.customer-nav a {
+    text-decoration: none;
+    background-color: transparent;
+}
+.customer-nav a:hover {
+    background-color: #f8f9fa;
+}
+.customer-nav .list-group-item.active {
+    border-color: #dee2e6;
+    background: #dee2e6;
+    color: #212529;
+}
+
+</style>
+{% endblock %}
