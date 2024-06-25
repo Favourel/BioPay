@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
 
     'crispy_forms',
+    "pwa",
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -151,3 +152,55 @@ LOGOUT_REDIRECT_URL = "login"
 PAYSTACK_SECRET_KEY = os.environ.get("PAYSTACK_SECRET_KEY")
 PAYSTACK_PUBLIC_KEY = os.environ.get("PAYSTACK_PUBLIC_KEY")
 
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
+
+PWA_APP_NAME = 'BioPay'
+PWA_APP_DESCRIPTION = "BioPay - FYP"
+PWA_APP_THEME_COLOR = '#db3717'
+PWA_APP_BACKGROUND_COLOR = '#ffffff'
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_SCOPE = "login"
+PWA_APP_ORIENTATION = 'any'
+PWA_APP_START_URL = "login"
+PWA_APP_STATUS_BAR_COLOR = 'default'
+PWA_APP_ICONS = [
+    {
+        'src': 'static/images/Square150x150Logo.scale-200.png',
+        'sizes': '300x300'
+    }
+]
+PWA_APP_ICONS_APPLE = [
+    {
+        'src': 'static/images/Square150x150Logo.scale-200.png',
+        'sizes': '300x300'
+    }
+]
+PWA_APP_SPLASH_SCREEN = [
+    {
+        'src': 'static/images/Square150x150Logo.scale-200.png',
+        'media': '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)'
+    }
+]
+PWA_APP_DIR = 'ltr'
+PWA_APP_LANG = 'en-US'
+
+PWA_APP_SCREENSHOTS = [
+    {
+      'src': '/static/images/Square150x150Logo.scale-200.png',
+      'sizes': '300x300',
+      "type": "image/png"
+    }
+]
+# PWA_APP_SCREENSHOTS = [
+#     {
+#         'src': 'static/images/127.0.0.1_8000_products_.png',
+#         'sizes': '1537x1886',
+#         'type': 'image/png',
+#         'form_factor': 'wide'
+#     },
+#     {
+#         'src': 'static/images/127.0.0.1_8000_products_.png',
+#         'sizes': '640x480',
+#         'type': 'image/png'
+#     }
+# ]

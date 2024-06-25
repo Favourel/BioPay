@@ -10,56 +10,103 @@
         width: 100%;
     }
 </style>
-<div class="container">
-    <h3 class="mt-2" style="font-family: vremenagrotesk,sans-serif;
-    font-weight: 900;line-height: 1.5;"><b>Available Drivers</b></h3>
-    <div class="row">
-        <div class="col-lg-9">
-            <div class="box-element">
-                <div id="map"></div>
-            </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="box-element">
-                {% if drivers|length > 0 %}
-                <a href="#" type="button" data-target="#BookRideModal"
-                   data-toggle="modal" class="btn btn-block">Book ride</a>
-                {% else %}
-                <button disabled href="#" type="button" data-target="#BookRideModal"
-                        data-toggle="modal" class="btn btn-block">Can not book ride right now
-                </button>
-                {% endif %}
-            </div>
-            <br>
-            {% if drivers|length > 0 %}
-            <div class="box-element">
-                <table class="table table-hover">
-                    <thead style="background-color: #f8f9fa;font-size: 13px">
-                    <tr>
-                        <th>Driver</th>
-                        <th>Number</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+<style>
+    .section {
+       background: #db3717;
+       border-color: #28346C;
+       color: #fff;
+       position: relative;
 
-                    {% for p in drivers %}
-                    <tr class="p-1">
-                        <td class="d-block">
-                            {{ p.user.username }} ({{ p.car_model }})
-                            <br>
-                        </td>
-                        <td>
-                            {{ p.phone_number }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+    }
+    .search-category {
+         position: absolute;
+         top: 190px;
+         width: 71%;
+    }
+
+</style>
+
+<div class="section">
+    <div class="container py-5" style="height: 32vh;">
+        <div class="row mt-5">
+            <div class="col">
+                <h3 style="font-family: vremenagrotesk,sans-serif;font-weight: 900;
+                line-height: 1.5;"><b>Available Drivers</b>
+                </h3>
             </div>
-            {% endif %}
+            <div class="col-auto">
+                <div class="row">
+                    <div class="col">
+                        <div class="media">
+                            <img src="{% static 'images/4-thumb.png' %}" width="50" height="50"
+                                 class="mr-2  user-image" fill="#fff" alt="">
+                            <div class="media-body ml-1">
+                                <h6 class="fs-6 fw-semibold text-white">
+                                     <b>{{request.user}}</b>
+                                </h6>
+                                <p>{{ request.user.status }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</div>
+<div class="container">
+    <div class="search-category">
+        <div class="row">
+            <div class="col-lg-9 mb-5">
+                <div class="box-element"
+                style="background-color: white !important;">
+                    <div id="map"></div>
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="col-lg-3">
+                <div class="box-element"
+                     style="background-color: white !important;">
+                    {% if drivers|length > 0 %}
+                    <a href="#" type="button" data-target="#BookRideModal"
+                       data-toggle="modal" class="btn btn-block">Book ride</a>
+                    {% else %}
+                    <button disabled href="#" type="button" data-target="#BookRideModal"
+                            data-toggle="modal" class="btn btn-block">Can not book ride right now
+                    </button>
+                    {% endif %}
+                </div>
+                <br>
+                {% if drivers|length > 0 %}
+                <div class="box-element">
+                    <table class="table table-hover">
+                        <thead style="background-color: #f8f9fa;font-size: 13px">
+                        <tr>
+                            <th>Driver</th>
+                            <th>Number</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        {% for p in drivers %}
+                        <tr class="p-1">
+                            <td class="d-block">
+                                {{ p.user.username }} ({{ p.car_model }})
+                                <br>
+                            </td>
+                            <td>
+                                {{ p.phone_number }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    </div>
 </div>
 <div class="modal fade" id="BookRideModal" tabindex="-3" aria-labelledby="bookrideModalLabel"
      aria-hidden="true">
@@ -91,7 +138,8 @@
                     <input type="hidden" id="id_longitude" name="longitude">
                     <div class="row">
                         <div class="col">
-                            <button type="button" class="btn mb-2" onclick="getStudentLocation()">Use My Location</button>
+                            <button type="button" class="btn mb-2" onclick="getStudentLocation()">Use My Location
+                            </button>
                         </div>
                         <div class="col-auto">
                             <button type="submit"

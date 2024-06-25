@@ -32,7 +32,8 @@ class UniversityAuthBackend(ModelBackend):
                 print(role_name)
 
                 # Check if user exists in our system, if not create a new one
-                user, created = user_model.objects.get_or_create(username=username, password=password)
+                user, created = user_model.objects.get_or_create(username=username,
+                                                                 )
                 if created:
                     user.email = user_data.get('email', '')
                     user.first_name = user_data.get('firstname', '')
@@ -48,7 +49,39 @@ class UniversityAuthBackend(ModelBackend):
                 raise RequestException(
                     "Authentication failed with status code: " + str(response.status_code))  # Raise exception
 
+        except requests.exceptions.HTTPError as http_err:
+
+            logging.error(f"HTTP error occurred: {http_err}")
+
+            print(f"Authentication failed: {http_err}")
+
+            return None
+        except requests.exceptions.ConnectionError as conn_err:
+
+            logging.error(f"Error connecting to the server: {conn_err}")
+
+            print(f"Authentication failed: {conn_err}")
+
+            return None
+        except requests.exceptions.Timeout as timeout_err:
+
+            logging.error(f"Timeout error occurred: {timeout_err}")
+
+            print(f"Authentication failed: {timeout_err}")
+
+            return None
+        except requests.exceptions.RequestException as req_err:
+
+            logging.error(f"Network-related error occurred: {req_err}")
+
+            print(f"Authentication failed: {req_err}")
+
+            return None
+
         except Exception as e:
-            # Handle exceptions (e.g., network issues, server errors)
+
+            logging.error(f"An unexpected error occurred: {e}")
+
             print(f"Authentication failed: {str(e)}")
+
             return None

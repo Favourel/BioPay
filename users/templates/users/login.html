@@ -1,6 +1,9 @@
 <!doctype html>
 {% load static %}
 {% load crispy_forms_tags %}
+{% load pwa %}
+{% load humanize %}
+{% progressive_web_app_meta %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -21,135 +24,110 @@
 </head>
 
 <style>
-    body{
 
-	margin-top: 2rem;
-}
-
-h1,h2,h3,h4,h5,h6{
-	color:hsl(0, 0%, 30%);
-}
-@media (min-width: 48em) {
-
-.box-element{
-	box-shadow:hsl(0, 0%, 80%) 0 0 16px;
-	background-color: ;
-	border-radius: 4px;
-	padding: 45px;
-}
-}
-@media only screen and (max-width: 600px) {
-.box-element{
-	border-radius: 4px;
-	padding: 3px;
+    h1,h2,h3,h4,h5,h6{
+        color:hsl(0, 0%, 30%);
     }
-}
-a {color: #fd5631;}
-a:hover{color:#fd5631}
+    @media (min-width: 48em) {
+
+    .box-element{
+        box-shadow:hsl(0, 0%, 80%) 0 0 16px;
+        background-color: ;
+        border-radius: 4px;
+        padding: 45px;
+    }
+    }
+    @media only screen and (max-width: 600px) {
+    .box-element{
+        border-radius: 4px;
+        padding: 3px;
+        }
+    }
+    a {color: #fd5631;}
+    a:hover{color:#fd5631}
 
 </style>
 
 <body>
 <style>
-    body {
-        background: url('{% static 'images/corner-1.png' %}') no-repeat;
-        background-attachment: fixed;
-        background-size: 100% 100%;
-        background-repeat: no-repeat;
-        background-position: right;
-        border-top-right-radius: .375rem;
-        }
-        .btn{
+    .btn{
         background: #fd5631;
         border-color: #fd5631;
         color: #fff;
-        }
+    }
     .btn:hover{
         background: #db3717;
         border-color: #db3717;
         color: #fff;
-        }
+    }
 </style>
 
-<div class="container" align="center">
-</div>
-
-<div class="container" align="center">
-    <div class="col-lg-12">
-        <a class="navbar-brand order-row" href="/">
+<div class="login-container">
+    <div class="left-side">
+        <a class="brand-logo order-row" href="/">
             <div style="display:block">
-                <img src="{% static 'images/Unilorin_6500995e76d79.jpeg' %}" class="mb-3" width="55px" height="55px" alt="">
-
-                <h2 style="color: black;display: inline-block; font-family:
+                <h2 style="color: white;display: inline-block; font-family:
                     vremenagrotesk,sans-serif;font-weight: 900;">
                     <b>BioPay</b>
                 </h2>
             </div>
         </a>
         <br>
-        <div class="box-element">
-            <div class="row">
-                <div class="col-lg-6 brand-logo">
-                    <div class="d-block" align="left">
-                        <h3 class="float-left mb-2">
-                            <b>Hey, welcome back!</b>
-                            <br>
-                            <b class="mt-2">Sign in to BioPay.</b>
-                        </h3>
-                        <br>
+        <br>
+        {% include 'users/svg.html' %}
+        <h3 class="mb-2 text-light">
+            <b>Hey, welcome back!</b>
+            <br>
+            <b class="mt-2">Sign in to BioPay.</b>
+        </h3>
+    </div>
+    <div class="right-side" align="center">
+        <h3 class="mt-5">
+            <b>Sign in with Matric Number</b>
+            <p style="font-size: 15px">Username is case-sensitive.
+                Kindly ensure the alphabet is in upper-case.</p>
+        </h3>
+        <div class="col-8">
+            <form id="login-form" method="POST" action="">
+                {% csrf_token %}
+                <div class="form-group">
+                    <br>
+                    <br>
+                    <br>
+                    {{ form|crispy }}
+                    <small class="text-muted float-left">
+                        Show password
+                    </small>
+                    <br>
+                    <label class="switch">
+                        <input type="checkbox" id="togglePassword">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <p class="text-muted">
+                    <a class="text-decoration-none mb-2 float-right"
+                       href="{% url 'register_driver' %}">Register as a driver?
+                    </a>
+                </p>
+                <br>
+                <button style="border-radius: 24px" id="submit" type="submit" class="btn btn-block">
+                    <div class="spinner-border text-light hidden" id="spinner" role="status">
+                        <span class="sr-only">Loading...</span>
                     </div>
 
-                    <br>
-                    <br>
-                    <br>
-                    {% include 'users/svg.html' %}
-                </div>
-                <div class="col-lg-6 p-2">
-                    <div style="border-radius: 3px;margin-bottom: 20px;" class=" rounded overflow-hidden ">
-                        <form id="login-form" method="POST" action="">
-                            {% csrf_token %}
-                            <div class="form-group">
-                                <br>
-                                <br>
-                                <br>
-                                {{ form|crispy }}
-                                <small class="text-muted float-left">
-                                    Show password
-                                </small>
-                                <br>
-                                <label class="switch">
-                                    <input type="checkbox" id="togglePassword">
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                            <p class="text-muted">
-                                <a class="text-decoration-none mb-2 float-right"
-                                   href="{% url 'register_driver' %}">Register as a driver?
-                                </a>
-                            </p>
-                            <br>
-                            <button style="border-radius: 24px" id="submit" type="submit" class="btn btn-block">
-                                <div class="spinner-border text-light hidden" id="spinner" role="status">
-                                    <span class="sr-only">Loading...</span>
-                                </div>
-
-                                <span id="button-text">LOGIN</span>
-                            </button>
-                            <style>
-                                .spinner-border {
-                                    width: 1.5rem;
-                                    height: 1.5rem;
-                                }
+                    <span id="button-text">LOGIN</span>
+                </button>
+                <style>
+                    .spinner-border {
+                        width: 1.5rem;
+                        height: 1.5rem;
+                    }
 
 
-                            </style>
-                        </form>
-                    </div>
-                </div>
-            </div>
+                </style>
+            </form>
         </div>
     </div>
-    <br>
     <!--    <a href="javascript:history.go(-1)" class="btn mt-2 mb-3 btn-outline-info">&#x2190; Go back</a>-->
 </div>
 <style>
@@ -244,7 +222,49 @@ a:hover{color:#fd5631}
     }
     ul {
         margin-left:13rem;
-        }
+    }
+    body {
+        margin: 0;
+        display: flex;
+        min-height: 100vh;
+    }
+
+    .login-container {
+        display: flex;
+        flex-grow: 1;
+    }
+
+    .left-side {
+        flex: 1;
+        background-color: #db3717;
+        color: white;
+        text-align: center;
+        padding: 50px;
+    }
+
+    .left-side img {
+        width: 200px;
+        height: 200px;
+        margin-bottom: 20px;
+    }
+
+    .left-side p {
+        margin-bottom: 30px;
+    }
+
+    .right-side {
+        flex: 1;
+        padding: 50px;
+        margin-top: 50px;
+    }
+    .brand-logo {
+        margin-top: 20px; /* Adjust spacing if needed */
+    }
+
+    .right-side h2 {
+        margin-bottom: 10px;
+    }
+
 </style>
 <script>
     let paymentForm = document.getElementById('login-form');
@@ -270,6 +290,16 @@ a:hover{color:#fd5631}
     };
 
 </script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
 </body>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"

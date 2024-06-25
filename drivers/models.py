@@ -32,6 +32,13 @@ class Ride(models.Model):
     end_location = models.CharField(max_length=100)
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(null=True, blank=True)
+
+    start_latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
+    start_longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
+    end_latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
+    end_longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
+    distance_covered = models.DecimalField(max_digits=5, decimal_places=2, null=True)  # Distance in kilometers
+
     fare = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('accepted', 'Accepted'),
                                                       ('completed', 'Completed')], default='pending')

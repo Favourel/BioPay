@@ -20,6 +20,7 @@ from django.contrib import messages
 import geopy.geocoders
 from django.views.decorators.csrf import csrf_exempt
 import base64
+import math
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
@@ -37,14 +38,13 @@ class CustomLoginView(auth_view.LoginView):
         else:
             return reverse_lazy('dashboard')
 
-
 @login_required
 @status_check_middleware
 def user_dashboard(request):
     ride_history = Ride.objects.filter(user=request.user).exclude(status="pending")
     current_rides = Ride.objects.filter(user=request.user).exclude(status='pending')
     notifications = Notification.objects.filter(user=request.user, has_seen=False)
-    ride_total = sum([ride.fare for ride in Ride.objects.filter(user=request.user).exclude(status="pending")])
+    ride_total = sum([ride.fare for ride in Ride.objects.filter(user=request.user, status="completed")])
 
     month = Ride.objects.filter(user=request.user, start_time__gte=datetime.now() - timedelta(days=30)).exclude(status="pending")
     context = {
@@ -98,7 +98,7 @@ def search_drivers(request):
 
         if not all([latitude, longitude]):
             messages.error(request, "Missing location")
-            return HttpResponseRedirect("../")
+            return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
         # Convert to floats
         user_latitude = float(latitude)
@@ -134,7 +134,7 @@ def book_ride(request):
 
         geolocator = Nominatim(user_agent="drivers")
         location = geolocator.reverse(user_location)
-        print(location)
+        print(user_location)
         if location:
             start_location_string = location.address
             print(start_location_string)
@@ -157,7 +157,10 @@ def book_ride(request):
                 driver=nearest_driver,
                 start_location=start_location_string,
                 end_location=drop_off_location,
-                status="pending"
+                status="pending",
+
+                # start_latitude=request.POST.get('latitude'),
+                # start_longitude=request.POST.get('longitude'),
             )
 
             ride.save()
@@ -175,13 +178,82 @@ def ride_details(request, pk):
     """
     notifications = Notification.objects.filter(user=request.user, has_seen=False)
     ride = get_object_or_404(Ride, pk=pk)  # Retrieve ride object or raise 404 for invalid ID
-    ride_history = Ride.objects.filter(user=request.user).exclude(status="pending")
+    ride_history = Ride.objects.filter(user=request.user, status="completed")
     context = {
         'ride': ride,
         "notifications": notifications,
         "ride_history": ride_history
     }
     return render(request, 'drivers/ride_details.html', context)
+
+
+@login_required
+@status_check_middleware
+def recent_ride(request):
+    notifications = Notification.objects.filter(user=request.user, has_seen=False)
+    most_recent_ride = Ride.objects.filter(user=request.user,
+                                           status="completed").latest('-start_time')
+    ride_history = Ride.objects.filter(user=request.user, status="completed")
+
+    # Check if a ride exists
+    if not most_recent_ride:
+        context = {'error': 'No rides found for this user.'}
+
+    else:
+        context = {
+            'ride': most_recent_ride,
+            "notifications": notifications,
+            "ride_history": ride_history,
+            'error': 'No rides found for this user.'
+        }
+
+    return render(request, 'drivers/ride_details.html', context)
+
+
+def haversine_distance(lat1, lon1, lat2, lon2):
+    # Radius of the Earth in kilometers
+    R = 6371.0
+
+    # Convert latitude and longitude from degrees to radians
+    lat1_rad = math.radians(lat1)
+    lon1_rad = math.radians(lon1)
+    lat2_rad = math.radians(lat2)
+    lon2_rad = math.radians(lon2)
+
+    # Difference in coordinates
+    dlat = lat2_rad - lat1_rad
+    dlon = lon2_rad - lon1_rad
+
+    # Haversine formula
+    a = math.sin(dlat / 2) ** 2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2) ** 2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+    # Distance in kilometers
+    distance = R * c
+    return distance
+
+@login_required
+def complete_ride(request, pk):
+    ride = get_object_or_404(Ride, pk=pk)
+
+    if request.method == 'POST':
+        # Assuming the end location details are sent with the request
+        ride.end_latitude = request.POST['end_latitude']
+        ride.end_longitude = request.POST['end_longitude']
+        ride.end_location = request.POST['end_location']
+
+        # Calculate the distance covered
+        distance = haversine_distance(ride.start_latitude, ride.start_longitude, ride.end_latitude, ride.end_longitude)
+        ride.distance_covered = round(distance, 2)
+
+        # Update ride status to completed
+        ride.status = 'completed'
+        ride.save()
+
+        return JsonResponse(
+            {'status': 'success', 'message': 'Ride completed successfully', 'distance_covered': ride.distance_covered})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
 
 def fingerprint_payment(request, ride_id):
@@ -233,3 +305,7 @@ def process_payment(request):
             return JsonResponse({'status': 'error', 'message': str(e)})
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+
+def offline(request):
+    return render(request, 'users/offline.html')

@@ -26,7 +26,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("users.urls")),
     path("", include("drivers.urls")),
-    path("", LogoutCheckMiddleware(CustomLoginView.as_view(template_name="users/login.html")), name="login"),
+    path('', include('pwa.urls')),
+    path("", LogoutCheckMiddleware(CustomLoginView.as_view(
+        template_name="users/login.html")), name="login"),
     path("logout/", auth_view.LogoutView.as_view(), name="logout"),
 ]
 

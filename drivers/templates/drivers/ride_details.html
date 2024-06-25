@@ -4,84 +4,248 @@
 {% block title %} Available Driver {% endblock %}
 
 {% block content %}
-<br>
-<div class="container mt-2">
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="box-element">
-                <h4><b>Ride Details</b></h4>
-                <table class="table table-hover">
-                    <thead style="background-color: #f8f9fa;font-size: 13px">
-                    <tr>
-                        <th>Ride ID</th>
-                        <th>User</th>
-                        <th>Driver</th>
-                        <th>Origin</th>
-                        <th>Destination</th>
-                        <th>Status</th>
-                    </tr>
-                    </thead>
-                    {% if ride %}
-                    <tbody>
-                    <tr class="p-1">
-                        <td class="d-block">
-                            {{ ride.id }}
-                            <br>
-                        </td>
-                        <td>
-                            {{ ride.user.username }}
-                        </td>
-                        <td>
-                            {{ ride.driver.user}}
-                        </td>
-                        <td>
-                            {{ ride.start_location }}
-                        </td>
-                        <td>
-                            {{ ride.end_location }}
-                        </td>
-                        <td>
-                            {{ ride.status }}
-                        </td>
-                    </tr>
-                    </tbody>
-                    {% else %}
-                    <p>Invalid ride ID or ride not found.</p>
-                    {% endif %}
-                </table>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<style>
+    .section {
+       background: #db3717;
+       border-color: #28346C;
+       color: #fff;
+       position: relative;
+
+    }
+    .search-category {
+         position: absolute;
+         top: 190px;
+         width: 71%;
+    }
+
+</style>
+
+<div class="section">
+    <div class="container py-5" style="height: 32vh;">
+        <div class="row mt-5">
+            <div class="col">
+                <h3 style="font-family: vremenagrotesk,sans-serif;font-weight: 900;
+                line-height: 1.5;"><b>Previous Rides</b>
+                </h3>
             </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="box-element">
-                <h4><b>Previous trips</b></h4>
-                <hr>
-                {% for ride in ride_history %}
-                <a class="text-decoration-none text-dark" href="{{ride.get_absolute_url}}">
-                    <div class="row">
-                        <div class="col">
-                            <div class="media">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" fill="currentColor"
-                                     class="bi bi-truck-front-fill mt-2" viewBox="0 0 16 16">
-                                    <path d="M3.5 0A2.5 2.5 0 0 0 1 2.5v9c0 .818.393 1.544 1 2v2a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5V14h6v1.5a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-2c.607-.456 1-1.182 1-2v-9A2.5 2.5 0 0 0 12.5 0zM3 3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3.9c0 .625-.562 1.092-1.17.994C10.925 7.747 9.208 7.5 8 7.5s-2.925.247-3.83.394A1.008 1.008 0 0 1 3 6.9zm1 9a1 1 0 1 1 0-2 1 1 0 0 1 0 2m8 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2m-5-2h2a1 1 0 1 1 0 2H7a1 1 0 1 1 0-2"/>
-                                </svg>
-                                <div class="media-body ml-2">
-                                    <b>{{ride.end_location}}</b>
-                                    <div>
-                                        <small>{{ride.start_time}}</small>
-                                    </div>
-                                </div>
+            <div class="col-auto">
+                <div class="row">
+                    <div class="col">
+                        <div class="media">
+                            <img src="{% static 'images/4-thumb.png' %}" width="50" height="50"
+                                 class="mr-2  user-image" fill="#fff" alt="">
+                            <div class="media-body ml-1">
+                                <h6 class="fs-6 fw-semibold text-white">
+                                     <b>{{request.user}}</b>
+                                </h6>
+                                <p>{{ request.user.status }}</p>
                             </div>
                         </div>
-                        <div class="col-auto">
-                            <b>₦{{ride.fare|intcomma}}</b>
-                        </div>
                     </div>
-                </a>
+                    <div class="col-auto">
+                        {% if request.user.status == "Student" %}
+                        <form action="{% url 'search_drivers' %}" method="GET" id="driver-search-form">
+                            <input type="hidden" id="latitude" name="latitude">
+                            <input type="hidden" id="longitude" name="longitude">
 
-                <hr>
-                {% endfor %}
+                            <button class="btn btn-danger shadow btn-block" onclick="getUserLocation()" type="submit">
+                                SEARCH DRIVERS
+                                <svg width="1em" height="1em" viewBox="0 0 16 16"
+                                     class="bi bi-search" fill="currentColor"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                          d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
+                                    <path fill-rule="evenodd"
+                                          d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+                                </svg>
+                            </button>
+                        </form>
+                        <script>
+                            function getUserLocation() {
+                                if (navigator.geolocation) {
+                                    navigator.geolocation.getCurrentPosition(showPosition);
+                                    alert("Location collected!")
+                                } else {
+                                    alert("Geolocation is not supported by this browser.");
+                                }
+                            }
+
+                            function showPosition(position) {
+                                document.getElementById("latitude").value = position.coords.latitude;
+                                document.getElementById("longitude").value = position.coords.longitude;
+                                document.getElementById('driver-search-form').submit();
+                            }
+
+                        </script>
+                        {% else %}
+                        <button class="btn btn-block">
+                            INITIATE PAYMENT
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+<div class="container">
+    <div class="search-category">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="box-element" style="background-color: white !important;">
+                    <h4><b>Ride Details</b></h4>
+                    <table class="table table-hover">
+                        <thead style="background-color: #f8f9fa;font-size: 13px">
+                        <tr>
+                            <th>Ride ID</th>
+                            <th>User</th>
+                            <th>Driver</th>
+                            <th>Origin</th>
+                            <th>Destination</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        {% if ride %}
+                        <tbody>
+                        <tr class="p-1">
+                            <td class="d-block">
+                                {{ ride.id }}
+                                <br>
+                            </td>
+                            <td>
+                                {{ ride.user.username }}
+                            </td>
+                            <td>
+                                {{ ride.driver.user}}
+                            </td>
+                            <td>
+                                {{ ride.start_location }}
+                            </td>
+                            <td>
+                                {{ ride.end_location }}
+                            </td>
+                            <td>
+                                {{ ride.status }}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <p>Invalid ride ID or ride not found.</p>
+                        </tbody>
+                        {% endif %}
+                    </table>
+                    <hr>
+                    <div class="row">
+                        <div class="col"></div>
+                        <div class="col-auto">
+                            {% if ride.status == "accepted" %}
+                            <button id="completeRideBtn" class="btn btn-block" data-ride-id="{{ ride.id }}">Complete Ride</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="box-element">
+                    <div id="map" style="height: 330px; width: 100%;"></div>
+                </div>
+                <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+                <script>
+                    document.addEventListener('DOMContentLoaded', (event) => {
+                        var map = L.map('map').setView([{{ ride.start_latitude }}, {{ ride.start_longitude }}], 13);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        }).addTo(map);
+
+                        var startPoint = [{{ ride.start_latitude }}, {{ ride.start_longitude }}];
+                        var endPoint = [{{ ride.end_latitude }}, {{ ride.end_longitude }}];
+
+                        L.marker(startPoint).addTo(map).bindPopup('{{ ride.start_location }}').openPopup();
+                        L.marker(endPoint).addTo(map).bindPopup('{{ ride.end_location }}').openPopup();
+
+                        var polyline = L.polyline([startPoint, endPoint], {color: '#fd5631'}).addTo(map);
+                        map.fitBounds(polyline.getBounds());
+                    });
+                </script>
+            </div>
+            <br>
+            <br>
+            <div class="col-lg-4">
+                <div class="box-element" style="background-color: white !important;">
+                    <h4><b>Previous trips</b></h4>
+                    <hr>
+                    {% for ride in ride_history %}
+                    <a class="text-decoration-none text-dark" href="{{ride.get_absolute_url}}">
+                        <div class="row">
+                            <div class="col">
+                                <div class="media">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" fill="currentColor"
+                                         class="bi bi-truck-front-fill mt-2" viewBox="0 0 16 16">
+                                        <path d="M3.5 0A2.5 2.5 0 0 0 1 2.5v9c0 .818.393 1.544 1 2v2a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5V14h6v1.5a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-2c.607-.456 1-1.182 1-2v-9A2.5 2.5 0 0 0 12.5 0zM3 3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3.9c0 .625-.562 1.092-1.17.994C10.925 7.747 9.208 7.5 8 7.5s-2.925.247-3.83.394A1.008 1.008 0 0 1 3 6.9zm1 9a1 1 0 1 1 0-2 1 1 0 0 1 0 2m8 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2m-5-2h2a1 1 0 1 1 0 2H7a1 1 0 1 1 0-2"/>
+                                    </svg>
+                                    <div class="media-body ml-2">
+                                        <b>{{ride.end_location}}</b>
+                                        <div>
+                                            <small>{{ride.start_time}}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <b>₦{{ride.fare|intcomma}}</b>
+                            </div>
+                        </div>
+                    </a>
+
+                    <hr>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    <script>
+    function completeRide(rideId, endLatitude, endLongitude, endLocation) {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch(`/complete_ride/${rideId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrftoken
+            },
+            body: new URLSearchParams({
+                'end_latitude': endLatitude,
+                'end_longitude': endLongitude,
+                'end_location': endLocation
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(`Ride completed successfully! Distance covered: ${data.distance_covered} km`);
+                // Optionally, redirect or update the UI to reflect the completed ride
+            } else {
+                alert('Error completing ride: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('An error occurred: ' + error);
+        });
+    }
+
+    document.getElementById('completeRideBtn').addEventListener('click', function() {
+        const rideId = this.getAttribute('data-ride-id');
+        const endLatitude = prompt("Enter end latitude:");
+        const endLongitude = prompt("Enter end longitude:");
+        const endLocation = prompt("Enter end location:");
+
+        if (endLatitude && endLongitude && endLocation) {
+            completeRide(rideId, endLatitude, endLongitude, endLocation);
+        } else {
+            alert('Please provide all end location details.');
+        }
+    });
+</script>
+
 {% endblock %}
