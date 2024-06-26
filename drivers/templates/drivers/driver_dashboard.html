@@ -408,33 +408,27 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="." method="post" class="my-withdrawal-form"
+                <form action="{% url 'update_driver_profile' %}" method="post" class="my-withdrawal-form"
                       data-url="">
                     {% csrf_token %}
                     {{ user_form}}
                     {{ profile_form }}
-                    <p><b id="password_result" class="mb-2 mt-1"
-                          style="float: center;margin-top: 0.25rem;font-size: 80%;"></b></p>
-                    <div class="row">
-                        <div class="col"></div>
-                        <div class="col-auto">
+                    <button class="btn create-submit_button btn-block btn-info" type="submit">
+                        Update Info
+                    </button>
+                    <style>
+                        .spinner-border {
+                            width: 1.5rem;
+                            height: 1.5rem;
+                        }
 
-                            <style>
-                                .spinner-border {
-                                    width: 1.5rem;
-                                    height: 1.5rem;
-                                }
-                                .hide, #password1, #password2 {
-                                    display: none;
-                                }
-                                form{display: flex;
-                                  flex-direction: column;
-                                  gap: 7px;
-                                  }
+                        form{display: flex;
+                          flex-direction: column;
+                          gap: 7px;
+                          }
 
-                            </style>
-                        </div>
-                    </div>
+                    </style>
+
                 </form>
             </div>
             <div class="modal-footer">

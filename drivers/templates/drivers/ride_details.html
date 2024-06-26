@@ -37,7 +37,7 @@
                                  class="mr-2  user-image" fill="#fff" alt="">
                             <div class="media-body ml-1">
                                 <h6 class="fs-6 fw-semibold text-white">
-                                     <b>{{request.user}}</b>
+                                    <b>{{request.user}}</b>
                                 </h6>
                                 <p>{{ request.user.status }}</p>
                             </div>
@@ -98,27 +98,29 @@
                     <table class="table table-hover">
                         <thead style="background-color: #f8f9fa;font-size: 13px">
                         <tr>
-                            <th>Ride ID</th>
                             <th>User</th>
                             <th>Driver</th>
                             <th>Origin</th>
                             <th>Destination</th>
                             <th>Status</th>
+                            <th>Distance</th>
                         </tr>
                         </thead>
                         {% if ride %}
                         <tbody>
                         <tr class="p-1">
-                            <td class="d-block">
-                                {{ ride.id }}
-                                <br>
-                            </td>
                             <td>
                                 {{ ride.user.username }}
                             </td>
+                            {% if ride.driver.user %}
                             <td>
                                 {{ ride.driver.user}}
                             </td>
+                            {% else %}
+                            <td>
+                                Ride hasn't been initiated, so Driver hasn't been selected!
+                            </td>
+                            {% endif %}
                             <td>
                                 {{ ride.start_location }}
                             </td>
@@ -128,6 +130,11 @@
                             <td>
                                 {{ ride.status }}
                             </td>
+                            {% if ride.status == "completed" %}
+                            <td>
+                                {{ ride.distance_covered }}km
+                            </td>
+                            {% endif %}
                         </tr>
                         {% else %}
                         <p>Invalid ride ID or ride not found.</p>
@@ -139,11 +146,18 @@
                         <div class="col"></div>
                         <div class="col-auto">
                             {% if ride.status == "accepted" %}
-                            <button id="completeRideBtn" class="btn btn-block" data-ride-id="{{ ride.id }}">Complete Ride</button>
+                            <button id="completeRideBtn" class="btn btn-block"
+                                    data-ride-id="{{ ride.id }}">
+                                Complete Ride
+                            </button>
+                            <input type="hidden" id="id_of_latitude" name="end_latitude">
+                            <input type="hidden" id="id_of_longitude" name="end_longitude">
+                            <span id="location_status"></span>
                             {% endif %}
                         </div>
                     </div>
                 </div>
+
                 <br>
                 <div class="box-element">
                     <div id="map" style="height: 330px; width: 100%;"></div>
@@ -204,8 +218,7 @@
     </div>
 </div>
 <script>
-    <script>
-    function completeRide(rideId, endLatitude, endLongitude, endLocation) {
+    function completeRide(rideId, endLatitude, endLongitude) {
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
         fetch(`/complete_ride/${rideId}/`, {
@@ -217,13 +230,14 @@
             body: new URLSearchParams({
                 'end_latitude': endLatitude,
                 'end_longitude': endLongitude,
-                'end_location': endLocation
+                //'end_location': endLocation
             })
         })
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
                 alert(`Ride completed successfully! Distance covered: ${data.distance_covered} km`);
+                window.location.href = "{{ride.get_absolute_url}}"
                 // Optionally, redirect or update the UI to reflect the completed ride
             } else {
                 alert('Error completing ride: ' + data.message);
@@ -234,17 +248,43 @@
         });
     }
 
-    document.getElementById('completeRideBtn').addEventListener('click', function() {
-        const rideId = this.getAttribute('data-ride-id');
-        const endLatitude = prompt("Enter end latitude:");
-        const endLongitude = prompt("Enter end longitude:");
-        const endLocation = prompt("Enter end location:");
+    //document.getElementById('completeRideBtn').addEventListener('click', function() {
+      //  const rideId = this.getAttribute('data-ride-id');
+        //const endLatitude = prompt("Enter end latitude:");
+        //const endLongitude = prompt("Enter end longitude:");
 
-        if (endLatitude && endLongitude && endLocation) {
-            completeRide(rideId, endLatitude, endLongitude, endLocation);
-        } else {
+       // if (endLatitude && endLongitude) {
+         //   completeRide(rideId, endLatitude, endLongitude);
+        //} else {
+        //    alert('Please provide all end location details.');
+        //}
+    //});
+
+    document.getElementById('completeRideBtn').addEventListener('click', function() {
+      const rideId = this.getAttribute('data-ride-id');
+
+      // Try to get current location using geolocation
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const endLatitude = position.coords.latitude;
+          const endLongitude = position.coords.longitude;
+          document.getElementById("id_of_latitude").value = endLatitude;
+          document.getElementById("id_of_longitude").value = endLongitude;
+          completeRide(rideId, endLatitude, endLongitude);
+          document.getElementById("location_status").innerText = "Location acquired!"; // Optional feedback
+        },
+        () => {
+          // Geolocation failed, fallback to prompts
+          const endLatitude = prompt("Enter end latitude:");
+          const endLongitude = prompt("Enter end longitude:");
+
+          if (endLatitude && endLongitude) {
+            completeRide(rideId, endLatitude, endLongitude);
+          } else {
             alert('Please provide all end location details.');
+          }
         }
+      );
     });
 </script>
 

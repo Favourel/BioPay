@@ -60,25 +60,7 @@
 </style>
 
 <div class="login-container">
-    <div class="left-side">
-        <a class="brand-logo order-row" href="/">
-            <div style="display:block">
-                <h2 style="color: white;display: inline-block; font-family:
-                    vremenagrotesk,sans-serif;font-weight: 900;">
-                    <b>BioPay</b>
-                </h2>
-            </div>
-        </a>
-        <br>
-        <br>
-        {% include 'users/svg.html' %}
-        <h3 class="mb-2 text-light">
-            <b>Hey, welcome back!</b>
-            <br>
-            <b class="mt-2">Sign in to BioPay as a driver.</b>
-        </h3>
-    </div>
-    <div class="right-side" align="center">
+    <div align="center" class="right-side">
         <h3 class="mt-0 mb-4">
             <b>Registration Information</b>
         </h3>
@@ -87,7 +69,7 @@
             <form id="login-form" method="POST" action="">
                 {% csrf_token %}
                 <div class="form-group" align="left">
-<!--                    <h4 class="float-left"><b>Enter Details*</b></h4>-->
+                    <!--                    <h4 class="float-left"><b>Enter Details*</b></h4>-->
                     <!--                                <h2>Registration Information</h2>-->
                     {{ user_form}}
                     {{ profile_form }}
@@ -108,6 +90,26 @@
                 </style>
             </form>
         </div>
+
+
+    </div>
+    <div class="left-side">
+        <a class="brand-logo order-row" href="/">
+            <div style="display:block">
+                <h2 style="color: white;display: inline-block; font-family:
+                    vremenagrotesk,sans-serif;font-weight: 900;">
+                    <b>BioPay</b>
+                </h2>
+            </div>
+        </a>
+        <br>
+        <br>
+        {% include 'users/svg.html' %}
+        <h3 class="mb-2 text-light">
+            <b>Hey, welcome back!</b>
+            <br>
+            <b class="mt-2">Sign in to BioPay as a driver.</b>
+        </h3>
     </div>
     <!--    <a href="javascript:history.go(-1)" class="btn mt-2 mb-3 btn-outline-info">&#x2190; Go back</a>-->
 </div>

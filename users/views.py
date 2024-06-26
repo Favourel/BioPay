@@ -1,4 +1,6 @@
 from decimal import Decimal
+
+import requests
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.contrib.auth import views as auth_view
@@ -127,17 +129,18 @@ def search_drivers(request):
 def book_ride(request):
     if request.method == 'POST':
         drop_off_location = request.POST['drop_off_location']
-        latitude = request.POST.get('latitude')
-        longitude = request.POST.get('longitude')
+        latitude = request.POST['latitude']
+        longitude = request.POST['longitude']
 
         user_location = (latitude, longitude)
 
-        geolocator = Nominatim(user_agent="drivers")
+        geolocator = Nominatim(user_agent="BioPay")
         location = geolocator.reverse(user_location)
         print(user_location)
+
         if location:
             start_location_string = location.address
-            print(start_location_string)
+            print("start_location_string")
         else:
             start_location_string = "Location unavailable"
 
@@ -154,13 +157,13 @@ def book_ride(request):
         if nearest_driver:
             ride = Ride.objects.create(
                 user=request.user,
-                driver=nearest_driver,
+                # driver=nearest_driver,
                 start_location=start_location_string,
                 end_location=drop_off_location,
                 status="pending",
 
-                # start_latitude=request.POST.get('latitude'),
-                # start_longitude=request.POST.get('longitude'),
+                start_latitude=latitude,
+                start_longitude=longitude,
             )
 
             ride.save()
@@ -177,8 +180,8 @@ def ride_details(request, pk):
     Retrieves and displays details for a specific ride based on the ID.
     """
     notifications = Notification.objects.filter(user=request.user, has_seen=False)
-    ride = get_object_or_404(Ride, pk=pk)  # Retrieve ride object or raise 404 for invalid ID
-    ride_history = Ride.objects.filter(user=request.user, status="completed")
+    ride = get_object_or_404(Ride, pk=pk, user=request.user)  # Retrieve ride object or raise 404 for invalid ID
+    ride_history = Ride.objects.filter(user=request.user, status="completed")[:4]
     context = {
         'ride': ride,
         "notifications": notifications,
@@ -192,8 +195,8 @@ def ride_details(request, pk):
 def recent_ride(request):
     notifications = Notification.objects.filter(user=request.user, has_seen=False)
     most_recent_ride = Ride.objects.filter(user=request.user,
-                                           status="completed").latest('-start_time')
-    ride_history = Ride.objects.filter(user=request.user, status="completed")
+                                           status="completed").latest('start_time')
+    ride_history = Ride.objects.filter(user=request.user, status="completed")[:4]
 
     # Check if a ride exists
     if not most_recent_ride:
@@ -232,15 +235,28 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     distance = R * c
     return distance
 
+
 @login_required
 def complete_ride(request, pk):
     ride = get_object_or_404(Ride, pk=pk)
 
     if request.method == 'POST':
         # Assuming the end location details are sent with the request
-        ride.end_latitude = request.POST['end_latitude']
-        ride.end_longitude = request.POST['end_longitude']
-        ride.end_location = request.POST['end_location']
+        ride.end_latitude = float(request.POST['end_latitude'])
+        ride.end_longitude = float(request.POST['end_longitude'])
+
+        # ride.end_location = request.POST['end_location']
+
+        user_location = (ride.end_latitude, ride.end_longitude)
+
+        geolocator = Nominatim(user_agent="BioPay")
+        location = geolocator.reverse(user_location)
+
+        place_name = location.raw.get('name', None)
+        full_address = location.address
+
+        ride.end_location = place_name + full_address
+        ride.end_time = datetime.now()
 
         # Calculate the distance covered
         distance = haversine_distance(ride.start_latitude, ride.start_longitude, ride.end_latitude, ride.end_longitude)

@@ -4,8 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import UserForm, DriverProfileForm, RideBookingForm
 from .models import Driver, Ride
-# from django.contrib.gis.db.models.functions import Distance
-# from django.contrib.gis.geos import Point
+
 from django.contrib.auth import login, authenticate, logout
 import datetime
 from users.middlewares.auth import driver_check_middleware
@@ -137,28 +136,3 @@ def delete_account(request):
     user.delete()
     logout(request)
     return redirect('login')
-
-# def service_worker(request):
-#     with open(settings.PWA_SERVICE_WORKER_PATH) as serviceworker_file:
-#         response = HttpResponse(
-#             serviceworker_file.read(),
-#             content_type="application/javascript",
-#         )
-#     return response
-#
-#
-# def manifest(request):
-#     return render(
-#         request,
-#         "manifest.json",
-#         {
-#             setting_name: getattr(settings, setting_name)
-#             for setting_name in dir(settings)
-#             if setting_name.startswith("PWA_")
-#         },
-#         content_type="application/json",
-#     )
-#
-#
-# def offline(request):
-#     return render(request, "drivers/offline.html")

@@ -13,7 +13,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="icon" href="{% static 'images/Square150x150Logo.scale-200.png' %}">
     <link rel="stylesheet" href="https://cdn.ayroui.com/1.0/css/tiny-slider.css"/>
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
     <!-- Bootstrap CSS -->
 
@@ -46,107 +45,102 @@
 <body id="page-top">
 {% include 'users/sidebar.html' %}
 <main id="main">
-    <div class="w3-sidebar w3-light w3-bar-block"
-         style="width:20% !important;border-color: black;">
-        <a href="/" class="text-dark text-decoration-none align-items-center">
-            <div class="media" align="center">
-                <!--                <img src="{% static 'images/tourist-man-with-backpack-standing-near-yellow-bus-illustration_890887-13157.jpg' %}"-->
-                <!--                     width="180px" height="180px" alt="">-->
-                <div class="media-body">
-                    <br>
-                    <br>
-                    <br>
-                    <h2 class="w3-bar-item mt-3"><b>BioPay</b></h2>
-                </div>
-            </div>
-        </a>
-        <br>
-        <hr>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-                <a href="{% url 'dashboard' %}" class="text-decoration-none w3-bar-item w3-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                         class="bi bi-house mb-1" viewBox="0 0 16 16">
-                        <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"/>
-                    </svg>
-                    Home</a>
-            </li>
-            <li class="list-group-item">
-                <a onclick="openNav()" data-href="#" class="text-decoration-none w3-bar-item w3-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                         class="bi bi-bell mb-1" viewBox="0 0 16 16">
-                        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6"/>
-                    </svg>
-                    Notification</a>
-            </li>
-            {% if request.user.status == "Student" %}
-            <li class="list-group-item">
-                <a href="#" class="text-decoration-none w3-bar-item w3-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                         class="bi bi-search mb-1" viewBox="0 0 16 16">
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-                    </svg>
-                    Search Driver</a>
-            </li>
-            {% endif %}
-            <li class="list-group-item">
-                <a href="#" class="text-decoration-none w3-bar-item w3-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                         class="bi bi-gear mb-1" viewBox="0 0 16 16">
-                        <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
-                        <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
-                    </svg>
-                    Settings</a>
-            </li>
-            <li class="list-group-item">
-                <a href="{% url 'recent_ride' %}" class="text-decoration-none w3-bar-item w3-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                         class="bi bi-truck-front mb-1" viewBox="0 0 16 16">
-                        <path d="M5 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0m8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-6-1a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2zM4 2a1 1 0 0 0-1 1v3.9c0 .625.562 1.092 1.17.994C5.075 7.747 6.792 7.5 8 7.5s2.925.247 3.83.394A1.008 1.008 0 0 0 13 6.9V3a1 1 0 0 0-1-1zm0 1h8v3.9q0 .002 0 0l-.002.004-.005.002h-.004C11.088 6.761 9.299 6.5 8 6.5s-3.088.26-3.99.406h-.003l-.005-.002L4 6.9q0 .002 0 0z"/>
-                        <path d="M1 2.5A2.5 2.5 0 0 1 3.5 0h9A2.5 2.5 0 0 1 15 2.5v9c0 .818-.393 1.544-1 2v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5V14H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2a2.5 2.5 0 0 1-1-2zM3.5 1A1.5 1.5 0 0 0 2 2.5v9A1.5 1.5 0 0 0 3.5 13h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 12.5 1z"/>
-                    </svg>
-                    Recent Rides</a>
-            </li>
-            {% if request.user.status == "Student" %}
-            <li class="list-group-item">
-                <a href="#" data-target="#TopUpModal" data-toggle="modal"
-                   class="text-decoration-none w3-bar-item w3-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                         class="bi bi-wallet2 mb-1" viewBox="0 0 16 16">
-                        <path d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z"/>
-                    </svg>
-                    Recharge Wallet</a>
-            </li>
-            {% endif %}
-        </ul>
-        <div class="fixed-bottom" style="bottom: 2px; width: 315px">
-            <div class="user-info ">
-                <div class="media">
-                    <img class="ml-3" src="{% static 'images/4-thumb.png' %}" alt="User Image">
-                    <div class="media-body ml-1">
-                        <p class="mb-1"><b>{{request.user}}</b></p>
-                        <span>{{request.user.status}}</span>
+    <div class="sidebar">
+        <div class="logo-container">
+            <a href="/" class="text-dark text-decoration-none align-items-center">
+                <div class="media" align="center">
+                    <!--                <img src="{% static 'images/tourist-man-with-backpack-standing-near-yellow-bus-illustration_890887-13157.jpg' %}"-->
+                    <!--                     width="180px" height="180px" alt="">-->
+                    <div class="media-body">
+                        <br>
+                        <br>
+                        <br>
+                        <h2 class="w3-bar-item mt-3"><b>BioPay</b></h2>
                     </div>
                 </div>
+            </a>
+        </div>
+        <hr>
 
-                <hr>
-                <a class="dropdown-item d-flex align-items-center" href="{% url 'logout' %}">
-                    <img src="{% static 'images/log-out.png' %}" style="width: 19px !important;
-                        height: 19px !important;" class="rounded-circle user-image mr-2" alt="">
-                    Logout
-                </a>
+        <ul class="list-group sidebar-list list-group-flush">
+                <li class="list-group-item">
+                    <a href="{% url 'dashboard' %}" class="text-decoration-none text-dark w3-bar-item w3-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="bi bi-house mb-1" viewBox="0 0 16 16">
+                            <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"/>
+                        </svg>
+                        Home</a>
+                </li>
+                <li class="list-group-item">
+                    <a onclick="openNav()" data-href="#" class="text-decoration-none text-dark w3-bar-item w3-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="bi bi-bell mb-1" viewBox="0 0 16 16">
+                            <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6"/>
+                        </svg>
+                        Notification</a>
+                </li>
+                {% if request.user.status == "Student" %}
+                <li class="list-group-item">
+                    <a href="#" class="text-decoration-none text-dark w3-bar-item w3-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="bi bi-search mb-1" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                        </svg>
+                        Search Driver</a>
+                </li>
+                {% endif %}
+                <li class="list-group-item">
+                    <a href="#" class="text-decoration-none text-dark w3-bar-item w3-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="bi bi-gear mb-1" viewBox="0 0 16 16">
+                            <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
+                            <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
+                        </svg>
+                        Settings</a>
+                </li>
+                <li class="list-group-item">
+                    <a href="{% url 'recent_ride' %}" class="text-decoration-none text-dark w3-bar-item w3-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="bi bi-truck-front mb-1" viewBox="0 0 16 16">
+                            <path d="M5 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0m8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-6-1a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2zM4 2a1 1 0 0 0-1 1v3.9c0 .625.562 1.092 1.17.994C5.075 7.747 6.792 7.5 8 7.5s2.925.247 3.83.394A1.008 1.008 0 0 0 13 6.9V3a1 1 0 0 0-1-1zm0 1h8v3.9q0 .002 0 0l-.002.004-.005.002h-.004C11.088 6.761 9.299 6.5 8 6.5s-3.088.26-3.99.406h-.003l-.005-.002L4 6.9q0 .002 0 0z"/>
+                            <path d="M1 2.5A2.5 2.5 0 0 1 3.5 0h9A2.5 2.5 0 0 1 15 2.5v9c0 .818-.393 1.544-1 2v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5V14H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2a2.5 2.5 0 0 1-1-2zM3.5 1A1.5 1.5 0 0 0 2 2.5v9A1.5 1.5 0 0 0 3.5 13h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 12.5 1z"/>
+                        </svg>
+                        Recent Rides</a>
+                </li>
+                {% if request.user.status == "Student" %}
+                <li class="list-group-item">
+                    <a href="#" data-target="#TopUpModal" data-toggle="modal"
+                       class="text-decoration-none text-dark w3-bar-item w3-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="bi bi-wallet2 mb-1" viewBox="0 0 16 16">
+                            <path d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z"/>
+                        </svg>
+                        Recharge Wallet</a>
+                </li>
+                {% endif %}
+            </ul>
+
+        <div class="user-info">
+
+            <div class="media">
+                <img class="ml-3" src="{% static 'images/4-thumb.png' %}" alt="User Image">
+                <div class="media-body ml-1">
+                    <p class="mb-1"><b>{{request.user}}</b></p>
+                    <span>{{request.user.status}}</span>
+                </div>
             </div>
+
+            <hr>
+            <a class="dropdown-item d-flex align-items-center" href="{% url 'logout' %}">
+                <img src="{% static 'images/log-out.png' %}" style="width: 19px !important;
+                        height: 19px !important;" class="rounded-circle user-image mr-2" alt="">
+                Logout
+            </a>
+
         </div>
     </div>
     <style>
-        .user-info {
-           /* Position at bottom */
-          bottom: 0;
-          width: 100%;  /* Span full width */
-          text-align: left;
-          padding: 10px;
-          background-color: white;
-        }
+
 
         .user-info img {
           width: 50px;
@@ -185,6 +179,40 @@
     </style>
 
     <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 20%;
+            background-color: white;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .sidebar-list {
+            list-style-type: none;
+            padding: 0;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-color: black !important;
+            color: black !important;
+        }
+        .user-info {
+            text-align: left;
+
+        }
+
         #overlay{
           position: fixed; /* Fixed position at bottom */
           z-index: 10; /* Ensure overlay is on top of content */
@@ -197,7 +225,7 @@
 
         }
         body {
-            background-color: #F0F6FB; !important;
+            background-color: #FFF; !important;
         }
 
     </style>

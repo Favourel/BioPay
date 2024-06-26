@@ -29,15 +29,15 @@ class Ride(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     driver = models.ForeignKey(Driver, on_delete=models.SET_NULL, null=True, blank=True)
     start_location = models.CharField(max_length=100)
-    end_location = models.CharField(max_length=100)
+    end_location = models.CharField(max_length=100, blank=True, null=True)
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(null=True, blank=True)
 
     start_latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
     start_longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
-    end_latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
-    end_longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
-    distance_covered = models.DecimalField(max_digits=5, decimal_places=2, null=True)  # Distance in kilometers
+    end_latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    end_longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    distance_covered = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Distance in kilometers
 
     fare = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('accepted', 'Accepted'),
@@ -46,6 +46,9 @@ class Ride(models.Model):
     def __str__(self):
         return (f"Ride from {self.start_location} to {self.end_location} "
                 f"requested by {self.user.username} (Status: {self.status})")
+
+    class Meta:
+        ordering = ['-start_time']
 
     def get_absolute_url(self):
         return reverse("ride-detail", kwargs={"pk": self.id})

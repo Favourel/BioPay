@@ -12,7 +12,7 @@ class DriverAdmin(admin.ModelAdmin):
 
 
 class RideAdmin(admin.ModelAdmin):
-    list_display = ["user", "driver", "start_location", "end_location", "status"]
+    list_display = ["user", "driver", "start_location", "end_location", "status", "start_time"]
     list_filter = ["user", "driver", "start_location", "end_location", "status"]
     list_per_page = 10
     search_fields = ["start_location", "status", "driver__user__username", "user__username"]

@@ -102,7 +102,7 @@ class DriverProfileForm(forms.ModelForm):
     class Meta:
         model = Driver
         fields = ['license_number', 'phone_number', 'latitude',
-                  'longitude', 'car_model', 'color']
+                  'longitude', 'car_model', 'color', "driver_picture"]
 
 
 class RideBookingForm(forms.ModelForm):

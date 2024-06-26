@@ -128,17 +128,17 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="{% url 'book_ride' %}" method="post" class=""
-                      data-url="">
+                <form action="{% url 'book_ride' %}" method="POST" id="book-ride-form">
                     {% csrf_token %}
                     {{ form.as_p }}
                     <input type="text" name="drop_off_location" class="form-control mb-2"
                            placeholder="Enter drop off location">
                     <input type="hidden" id="id_latitude" name="latitude">
                     <input type="hidden" id="id_longitude" name="longitude">
+                    <p id="location_status"></p>
                     <div class="row">
                         <div class="col">
-                            <button type="button" class="btn mb-2" onclick="getStudentLocation()">Use My Location
+                            <button type="button" class="btn mb-2" onclick="getCurrentLocation()">Use My Location
                             </button>
                         </div>
                         <div class="col-auto">
@@ -167,18 +167,19 @@
 </div>
 
 <script>
-    function getStudentLocation() {
+    function getCurrentLocation() {
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition);
-            alert("Done!.")
+            navigator.geolocation.getCurrentPosition(showPositionPoints);
+            //alert("Done!.")
         } else {
             alert("Geolocation is not supported by this browser.");
         }
     }
 
-    function showPosition(position) {
+    function showPositionPoints(position) {
         document.getElementById("id_latitude").value = position.coords.latitude;
         document.getElementById("id_longitude").value = position.coords.longitude;
+        document.getElementById("location_status").innerText = "Location acquired!";
     }
 </script>
 <script>
